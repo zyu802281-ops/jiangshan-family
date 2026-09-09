@@ -1,96 +1,13 @@
 {
-  "version": 1,
+  "version": 2,
   "familyName": "江山千秋万代",
   "people": [
-    {
-      "id": "p1",
-      "name": "第一代·家主",
-      "generation": 1,
-      "gender": "男",
-      "birth": "1980-01-01",
-      "death": "",
-      "title": "开国家主",
-      "spouses": [
-        "s1"
-      ],
-      "parents": []
-    },
-    {
-      "id": "p2",
-      "name": "第一代·正室",
-      "generation": 1,
-      "gender": "女",
-      "birth": "1982-01-01",
-      "death": "",
-      "title": "正室",
-      "spouses": [
-        "s1"
-      ],
-      "parents": []
-    },
-    {
-      "id": "p3",
-      "name": "第二代·嫡长子",
-      "generation": 2,
-      "gender": "男",
-      "birth": "2005-01-01",
-      "death": "",
-      "title": "继承人",
-      "spouses": [],
-      "parents": [
-        "p1",
-        "p2"
-      ]
-    },
-    {
-      "id": "p4",
-      "name": "第二代·庶子",
-      "generation": 2,
-      "gender": "男",
-      "birth": "2008-01-01",
-      "death": "",
-      "title": "庶子",
-      "spouses": [],
-      "parents": [
-        "p1"
-      ],
-      "motherType": "妾室"
-    },
-    {
-      "id": "p5",
-      "name": "第三代·嫡孙",
-      "generation": 3,
-      "gender": "男",
-      "birth": "2028-01-01",
-      "death": "",
-      "title": "",
-      "spouses": [],
-      "parents": [
-        "p3"
-      ]
-    },
-    {
-      "id": "p6",
-      "name": "第四代·嫡曾孙",
-      "generation": 4,
-      "gender": "女",
-      "birth": "2052-01-01",
-      "death": "",
-      "title": "",
-      "spouses": [],
-      "parents": [
-        "p5"
-      ]
-    }
+    {"id":"p1","name":"第一代·家主","gender":"男","birth":"1980-01-01","death":"","title":"开国家主","parents":[],"inherit":true},
+    {"id":"p2","name":"第一代·正室","gender":"女","birth":"1982-01-01","death":"","title":"正室","parents":[],"inherit":false},
+    {"id":"p3","name":"第二代·嫡长子","gender":"男","birth":"2005-01-01","death":"","title":"继承人","parents":["p1","p2"],"inherit":true},
+    {"id":"p4","name":"第二代·庶子","gender":"男","birth":"2008-01-01","death":"","title":"庶子","parents":["p1"],"inherit":false},
+    {"id":"p5","name":"第三代·嫡孙","gender":"男","birth":"2028-01-01","death":"","title":"","parents":["p3"],"inherit":false},
+    {"id":"p6","name":"第四代·嫡曾孙","gender":"女","birth":"2052-01-01","death":"","title":"","parents":["p5"],"inherit":false}
   ],
-  "spouses": [
-    {
-      "id": "s1",
-      "partners": [
-        "p1",
-        "p2"
-      ],
-      "type": "正室"
-    }
-  ]
+  "spouses":[{"id":"s1","partners":["p1","p2"],"type":"正室"}]
 }
