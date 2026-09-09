@@ -99,6 +99,9 @@ function showPersonForm(p){
  let x=p?clone(p):{id:'p'+Date.now(),name:'',gender:'男',birthYear:dbState.currentYear,deathYear:'',lifespan:'',title:'',parents:[],inherit:false,familyId:activeFamilyId,birthOrder:Date.now()};
  let others=people(true).filter(q=>q.id!==x.id);
  let fathers=others.filter(q=>q.gender==='男'&&q.familyId===activeFamilyId), mothers=others.filter(q=>q.gender==='女'&&q.familyId===activeFamilyId);
+ let selectedFather=x.parents?.map(person).find(q=>q?.gender==='男');
+ let spouseMothers=selectedFather?spousesOf(selectedFather.id).flatMap(s=>s.people).filter(q=>q.gender==='女'&&q.id!==x.id):[];
+ let motherPool=[...new Map([...mothers,...spouseMothers].map(q=>[q.id,q])).values()];
  modalRoot.innerHTML=`<div class="modal"><div class="sheet"><button class="close" onclick="closeModal()">✕</button><h2>${p?'编辑人物':'添加人物'}</h2>
  <label>姓名<input id="f_name" value="${esc(x.name)}"></label>
  <div class="row"><label>性别<select id="f_gender"><option ${x.gender==='男'?'selected':''}>男</option><option ${x.gender==='女'?'selected':''}>女</option></select></label><label>出生年份<input id="f_birth" type="number" value="${x.birthYear??dbState.currentYear}" placeholder="例如 ${dbState.currentYear}"></label></div>
@@ -107,15 +110,26 @@ function showPersonForm(p){
  <label>所属家族<div class="notice" style="margin:4px 0">${esc(familyNameById(x.familyId))}（本家族新增人物自动归入当前家族）</div></label>
  <div class="section-title">父母关系</div>
  <div class="row"><label>父亲<select id="f_parent1"><option value="">— 未登记 —</option>${fathers.map(o=>`<option value="${o.id}" ${x.parents?.includes(o.id)?'selected':''}>${esc(o.name)} · ${statusText(o)}</option>`).join('')}</select></label>
- <label>母亲<select id="f_parent2"><option value="">— 未登记 —</option>${mothers.map(o=>`<option value="${o.id}" ${x.parents?.includes(o.id)?'selected':''}>${esc(o.name)} · ${statusText(o)}</option>`).join('')}</select></label></div>
- <div class="notice">建议优先从父亲或母亲的人物信息里点击「＋新增子女」，父母会自动填写，避免选错。这里手动选择时也只显示当前家族且按性别筛选。</div>
+ <label>母亲<select id="f_parent2"><option value="">— 未登记 —</option>${motherPool.map(o=>`<option value="${o.id}" ${x.parents?.includes(o.id)?'selected':''}>${esc(o.name)} · ${familyNameById(o.familyId)} · ${statusText(o)}</option>`).join('')}</select></label></div>
+ <div class="notice">父亲默认只从当前家族选择；选择父亲后，母亲会自动扩展为该父亲登记的女性配偶，即使母亲属于其他家族也可以选择。这样跨家族婚姻不会被限制。</div>
  <label class="check"><input id="f_inherit" type="checkbox" ${x.inherit?'checked':''}> 标记为继承人</label>
  <div class="notice">出生年份默认当前游戏年份 ${dbState.currentYear}，因此新生人物默认显示<strong>1岁</strong>。嫡庶只作为身份标签，排行按男女分别计算，嫡庶混合排行。</div>
  <div class="section-title">配偶关系</div><div id="spouseEditor">${spousesOf(x.id).map(s=>s.people.map(o=>`<div class="relation">配偶：${esc(o.name)}　${familyNameById(o.familyId)}　身份：${esc(s.rel.type)} <button class="small danger" onclick="removeSpouse('${s.rel.id}','${x.id}')">解除</button></div>`).join('')).join('')||'<div class="muted">暂未登记配偶</div>'}</div>
  <div class="toolbar"><button onclick="addSpouse('${x.id}')">＋ 添加配偶</button>${p?`<button class="primary" onclick="addChild('${x.id}')">＋ 新增子女</button>`:''}</div>
  <div class="form-actions"><button class="primary" onclick="savePersonForm('${x.id}')">保存</button>${p?`<button class="danger" onclick="deletePerson('${x.id}')">删除人物</button>`:''}<button onclick="closeModal()">取消</button></div>
  </div></div>`
+ document.getElementById('f_parent1').addEventListener('change',()=>refreshParentMotherChoices(x.id));
 }
+function refreshParentMotherChoices(personId){
+ let sel=document.getElementById('f_parent1'), ms=document.getElementById('f_parent2'); if(!sel||!ms)return;
+ let current=ms.value, father=person(sel.value);
+ let base=people(true).filter(q=>q.id!==personId&&q.gender==='女'&&q.familyId===activeFamilyId);
+ let spouse=father?spousesOf(father.id).flatMap(s=>s.people).filter(q=>q.gender==='女'&&q.id!==personId):[];
+ let pool=[...new Map([...base,...spouse].map(q=>[q.id,q])).values()];
+ ms.innerHTML='<option value="">— 未登记 —</option>'+pool.map(o=>`<option value="${o.id}">${esc(o.name)} · ${familyNameById(o.familyId)} · ${statusText(o)}</option>`).join('');
+ if(pool.some(o=>o.id===current))ms.value=current;
+}
+
 function childParentsFor(id){
  let me=person(id), ss=spousesOf(id).flatMap(s=>s.people.filter(o=>o.id!==id).map(o=>({person:o,type:s.rel.type})));
  if(me?.gender==='女') return {mother:me,fathers:ss.filter(x=>x.person.gender==='男')};
