@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827"><link rel="manifest" href="manifest.json"><title>江山千秋万代 · 族谱辅助</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;background:#f5f6f8;color:#172033}
+header{padding:18px 18px 12px;background:#111827;color:white}h1{font-size:21px;margin:0}.sub{opacity:.7;font-size:12px;margin-top:5px}
+nav{display:flex;gap:6px;padding:8px;background:white;position:sticky;top:0;z-index:2;border-bottom:1px solid #ddd;overflow:auto}button{border:0;border-radius:10px;padding:9px 12px;background:#e8ebf0;color:#172033;font-weight:600}button.active{background:#111827;color:#fff}
+main{padding:14px;max-width:900px;margin:auto}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.card{background:white;border-radius:14px;padding:15px;box-shadow:0 1px 4px #00000010}.num{font-size:27px;font-weight:800}.muted{color:#687386;font-size:13px}.person{display:flex;justify-content:space-between;gap:10px;align-items:center;border-top:1px solid #eee;padding:12px 0}.badge{font-size:11px;background:#eee;padding:4px 7px;border-radius:8px}.tree{overflow:auto}.node{margin:8px 0;padding:11px 13px;background:white;border-left:3px solid #111827;border-radius:9px}.indent{margin-left:18px}
+input,select{width:100%;padding:11px;border:1px solid #d7dce4;border-radius:10px;margin:5px 0 10px;font-size:15px}.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+</style></head><body>
+<header><h1>江山千秋万代 · 族谱辅助</h1><div class="sub">第一版 · 本地保存 · 可离线使用</div></header>
+<nav id="nav"></nav><main id="app"></main>
+<script>
+const KEY="jiangshan-family-v1"; let db;
+const initial={"version": 1, "familyName": "江山千秋万代", "people": [{"id": "p1", "name": "第一代·家主", "generation": 1, "gender": "男", "birth": "1980-01-01", "death": "", "title": "开国家主", "spouses": ["s1"], "parents": []}, {"id": "p2", "name": "第一代·正室", "generation": 1, "gender": "女", "birth": "1982-01-01", "death": "", "title": "正室", "spouses": ["s1"], "parents": []}, {"id": "p3", "name": "第二代·嫡长子", "generation": 2, "gender": "男", "birth": "2005-01-01", "death": "", "title": "继承人", "spouses": [], "parents": ["p1", "p2"]}, {"id": "p4", "name": "第二代·庶子", "generation": 2, "gender": "男", "birth": "2008-01-01", "death": "", "title": "庶子", "spouses": [], "parents": ["p1"], "motherType": "妾室"}, {"id": "p5", "name": "第三代·嫡孙", "generation": 3, "gender": "男", "birth": "2028-01-01", "death": "", "title": "", "spouses": [], "parents": ["p3"]}, {"id": "p6", "name": "第四代·嫡曾孙", "generation": 4, "gender": "女", "birth": "2052-01-01", "death": "", "title": "", "spouses": [], "parents": ["p5"]}], "spouses": [{"id": "s1", "partners": ["p1", "p2"], "type": "正室"}]};
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||initial}catch(e){return initial}}
+db=load();
+const tabs=["总览","人物名录","家族树","死亡登记","设置"]; let tab="总览";
+function age(b,d){if(!b)return "—";let end=d?new Date(d):new Date(), x=new Date(b);let a=end.getFullYear()-x.getFullYear();if(end.getMonth()<x.getMonth()||(end.getMonth()==x.getMonth()&&end.getDate()<x.getDate()))a--;return Math.max(0,a)+"岁"}
+function save(){localStorage.setItem(KEY,JSON.stringify(db))}
+function renderNav(){nav.innerHTML=tabs.map(x=>`<button class="${x==tab?'active':''}" onclick="tab='${x}';render()">${x}</button>`).join("")}
+function render(){renderNav();let people=db.people;
+if(tab=="总览") app.innerHTML=`<div class="grid"><div class="card"><div class="muted">总人数</div><div class="num">${people.length}</div></div><div class="card"><div class="muted">男性</div><div class="num">${people.filter(p=>p.gender=="男").length}</div></div><div class="card"><div class="muted">女性</div><div class="num">${people.filter(p=>p.gender=="女").length}</div></div><div class="card"><div class="muted">已登记死亡</div><div class="num">${people.filter(p=>p.death).length}</div></div></div><div class="card" style="margin-top:12px"><b>当前示例谱系</b><p class="muted">已预置 1–4 代、正室、嫡/庶、继承人、爵位/封号字段及年龄计算。</p></div>`;
+if(tab=="人物名录") app.innerHTML=`<div class="card"><b>人物名录</b>${people.map(p=>`<div class="person"><div><b>${p.name}</b> <span class="badge">${p.gender} · ${p.generation}代</span><div class="muted">${p.title||"无封号"} · ${p.birth||"未录出生"} · ${age(p.birth,p.death)}</div></div><button onclick="editPerson('${p.id}')">编辑</button></div>`).join("")}<button onclick="addPerson()">＋ 添加人物</button></div>`;
+if(tab=="家族树") app.innerHTML=`<div class="card tree"><b>家族树</b>${people.map(p=>`<div class="node" style="margin-left:${(p.generation-1)*18}px"><b>${p.name}</b> <span class="badge">${p.title||"—"}</span><div class="muted">${p.parents?.length?'父母：'+p.parents.map(id=>people.find(x=>x.id==id)?.name).join('、'):'第一代/未登记父母'}</div></div>`).join("")}</div>`;
+if(tab=="死亡登记") app.innerHTML=`<div class="card"><b>死亡登记</b>${people.map(p=>`<div class="person"><div><b>${p.name}</b><div class="muted">${p.death?'死亡：'+p.death:'在世/未登记'}</div></div>${p.death?'<span class="badge">已登记</span>':'<button onclick="death(\''+p.id+'\')">登记</button>'}</div>`).join("")}</div>`;
+if(tab=="设置") app.innerHTML=`<div class="card"><b>数据管理</b><p class="muted">数据只保存在当前浏览器。</p><button onclick="exportData()">导出 JSON</button> <button onclick="resetData()">恢复第一版示例数据</button><hr><div class="muted">版本 1.0 · PWA 基础版</div></div>`;
+}
+function addPerson(){let n=prompt("人物姓名");if(!n)return;db.people.push({id:"p"+Date.now(),name:n,generation:1,gender:"男",birth:"",death:"",title:"",spouses:[],parents:[]});save();render()}
+function editPerson(id){let p=db.people.find(x=>x.id==id);let n=prompt("修改姓名",p.name);if(n){p.name=n;save();render()}}
+function death(id){let p=db.people.find(x=>x.id==id),d=prompt("死亡日期 YYYY-MM-DD");if(d){p.death=d;save();render()}}
+function exportData(){let a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:"application/json"}));a.download="江山千秋万代-族谱.json";a.click()}
+function resetData(){if(confirm("恢复第一版示例数据？")){db=JSON.parse(JSON.stringify(initial));save();render()}}
+render();
+</script></body></html>

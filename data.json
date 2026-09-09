@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "familyName": "江山千秋万代",
+  "people": [
+    {
+      "id": "p1",
+      "name": "第一代·家主",
+      "generation": 1,
+      "gender": "男",
+      "birth": "1980-01-01",
+      "death": "",
+      "title": "开国家主",
+      "spouses": [
+        "s1"
+      ],
+      "parents": []
+    },
+    {
+      "id": "p2",
+      "name": "第一代·正室",
+      "generation": 1,
+      "gender": "女",
+      "birth": "1982-01-01",
+      "death": "",
+      "title": "正室",
+      "spouses": [
+        "s1"
+      ],
+      "parents": []
+    },
+    {
+      "id": "p3",
+      "name": "第二代·嫡长子",
+      "generation": 2,
+      "gender": "男",
+      "birth": "2005-01-01",
+      "death": "",
+      "title": "继承人",
+      "spouses": [],
+      "parents": [
+        "p1",
+        "p2"
+      ]
+    },
+    {
+      "id": "p4",
+      "name": "第二代·庶子",
+      "generation": 2,
+      "gender": "男",
+      "birth": "2008-01-01",
+      "death": "",
+      "title": "庶子",
+      "spouses": [],
+      "parents": [
+        "p1"
+      ],
+      "motherType": "妾室"
+    },
+    {
+      "id": "p5",
+      "name": "第三代·嫡孙",
+      "generation": 3,
+      "gender": "男",
+      "birth": "2028-01-01",
+      "death": "",
+      "title": "",
+      "spouses": [],
+      "parents": [
+        "p3"
+      ]
+    },
+    {
+      "id": "p6",
+      "name": "第四代·嫡曾孙",
+      "generation": 4,
+      "gender": "女",
+      "birth": "2052-01-01",
+      "death": "",
+      "title": "",
+      "spouses": [],
+      "parents": [
+        "p5"
+      ]
+    }
+  ],
+  "spouses": [
+    {
+      "id": "s1",
+      "partners": [
+        "p1",
+        "p2"
+      ],
+      "type": "正室"
+    }
+  ]
+}
