@@ -238,7 +238,7 @@ function showChildForm(sourceId,fatherId,motherId){
 async function saveChildForm(sourceId,fatherId,motherId){lastAction='新增子女';
  let name=document.getElementById('child_name').value.trim()||'未命名人物',gender=document.getElementById('child_gender').value,birth=yearOf(document.getElementById('child_birth').value)||dbState.currentYear,life=Number(document.getElementById('child_lifespan').value);
  if(!Number.isInteger(life)||life<1||life>150)return alert('请填写有效的寿命（1～150岁）。');
- let father=person(fatherId),mother=person(motherId);
+ let father=person(fatherId),mother=person(motherId),fid=father?.familyId??mother?.familyId??activeFamilyId;
  let p={id:'p'+Date.now(),name,gender,birthYear:birth,deathYear:'',deathReason:'',deathType:'',note:'',age16Notified:false,lifespan:life,title:document.getElementById('child_title').value.trim(),parents:[fatherId,motherId].filter(Boolean),inherit:document.getElementById('child_inherit').checked,familyId:fid,birthOrder:Date.now(),parentsLocked:true};
  dbState.people.push(p);
  await persist(); closeModal(); render(); alert(`${name}已添加。${childRankLabel(p)?'排行：'+childRankLabel(p):''}`);
